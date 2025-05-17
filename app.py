@@ -1,4 +1,17 @@
 import streamlit as st
+from urllib.parse import urlparse, parse_qs
+
+# --- Secret Access Code ---
+ALLOWED_CODE = "letmein123"  # Change this to your real secret
+
+# --- Check if user provided correct code ---
+query_params = st.experimental_get_query_params()
+provided_code = query_params.get("code", [""])[0]
+
+if provided_code != ALLOWED_CODE:
+    st.error("🚫 Access Denied. Please use a valid invite link.")
+    st.stop()  # Halt the app here
+
 import openai
 import tempfile
 
