@@ -60,21 +60,6 @@ tone = st.selectbox(
     ["Neutral", "Casual", "Formal", "Funny", "Motivational", "Academic"]
 )
 
-    if st.button("🧠 Transcribe Audio"):
-        try:
-            client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
-
-            with open(tmp_path, "rb") as audio_file:
-                with st.spinner("🧠 Whispering secrets into the cloud..."):
-                    transcript = client.audio.transcriptions.create(
-                        model="whisper-1",
-                        file=audio_file
-                    )
-
-            st.success("✅ Transcription complete!")
-            st.subheader("📝 Transcript")
-            st.write(transcript.text)
-# --- Summarize with selected tone ---
 tone_instructions = {
     "Neutral": "Provide a clear and concise summary.",
     "Casual": "Summarize in a relaxed and friendly tone, like you're explaining it to a friend.",
@@ -84,10 +69,26 @@ tone_instructions = {
     "Academic": "Use academic language suitable for a research summary."
 }
 
-summary_prompt = f"""
+if st.button("🧠 Transcribe Audio"):
+    try:
+        client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+
+        with open(tmp_path, "rb") as audio_file:
+            with st.spinner("🧠 Whispering secrets into the cloud..."):
+                transcript = client.audio.transcriptions.create(
+                    model="whisper-1",
+                    file=audio_file
+                )
+
+        st.success("✅ Transcription complete!")
+        st.subheader("📝 Transcript")
+        st.write(transcript.text)
+
+        # --- Summarize in selected tone ---
+        summary_prompt = f"""
 You are an AI assistant. The user has uploaded a voice note and asked for a summary in the following tone:
 
-Tone: **{tone}**
+Tone: {tone}
 
 Instructions: {tone_instructions[tone]}
 
@@ -97,19 +98,19 @@ Here is the transcribed note:
 \"\"\"
 """
 
-with st.spinner("📝 Summarizing in your selected tone..."):
-    response = client.chat.completions.create(
-        model="gpt-4",
-        messages=[
-            {"role": "system", "content": "You summarize voice notes."},
-            {"role": "user", "content": summary_prompt}
-        ]
-    )
+        with st.spinner("📝 Summarizing in your selected tone..."):
+            response = client.chat.completions.create(
+                model="gpt-4",
+                messages=[
+                    {"role": "system", "content": "You summarize voice notes."},
+                    {"role": "user", "content": summary_prompt}
+                ]
+            )
 
-    summary = response.choices[0].message.content
-    st.subheader("💡 Summary")
-    st.write(summary)
+        summary = response.choices[0].message.content
+        st.subheader("💡 Summary")
+        st.write(summary)
 
-        except Exception as e:
-            st.error("❌ Something went wrong during transcription.")
-            st.exception(e)
+    except Exception as e:
+        st.error("❌ Something went wrong during transcription.")
+        st.exception(e)
