@@ -55,6 +55,11 @@ if uploaded_file is not None:
 
     st.audio(tmp_path, format="audio/wav")
 
+tone = st.selectbox(
+    "Choose the summary tone:",
+    ["Neutral", "Casual", "Formal", "Funny", "Motivational", "Academic"]
+)
+
     if st.button("🧠 Transcribe Audio"):
         try:
             client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
@@ -69,6 +74,41 @@ if uploaded_file is not None:
             st.success("✅ Transcription complete!")
             st.subheader("📝 Transcript")
             st.write(transcript.text)
+# --- Summarize with selected tone ---
+tone_instructions = {
+    "Neutral": "Provide a clear and concise summary.",
+    "Casual": "Summarize in a relaxed and friendly tone, like you're explaining it to a friend.",
+    "Formal": "Summarize in a professional and respectful tone suitable for a business report.",
+    "Funny": "Add a light and humorous twist to the summary, keep it witty.",
+    "Motivational": "Make the summary uplifting and energizing, like a pep talk.",
+    "Academic": "Use academic language suitable for a research summary."
+}
+
+summary_prompt = f"""
+You are an AI assistant. The user has uploaded a voice note and asked for a summary in the following tone:
+
+Tone: **{tone}**
+
+Instructions: {tone_instructions[tone]}
+
+Here is the transcribed note:
+\"\"\"
+{transcript.text}
+\"\"\"
+"""
+
+with st.spinner("📝 Summarizing in your selected tone..."):
+    response = client.chat.completions.create(
+        model="gpt-4",
+        messages=[
+            {"role": "system", "content": "You summarize voice notes."},
+            {"role": "user", "content": summary_prompt}
+        ]
+    )
+
+    summary = response.choices[0].message.content
+    st.subheader("💡 Summary")
+    st.write(summary)
 
         except Exception as e:
             st.error("❌ Something went wrong during transcription.")
