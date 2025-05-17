@@ -39,27 +39,17 @@ if uploaded_file is not None:
 
     st.audio(tmp_path, format="audio/wav")
 
-    if st.button("🧠 Transcribe + Summarize"):
-        with open(tmp_path, "rb") as audio_file:
-            transcript = client.audio.transcriptions.create(
-                model="whisper-1",
-                file=audio_file
-            )
+    if st.button("🧠 Transcribe Audio"):
+        try:
+            with open(tmp_path, "rb") as audio_file:
+                transcript = client.audio.transcriptions.create(
+                    model="whisper-1",
+                    file=audio_file
+                )
+                st.subheader("📝 Transcript")
+                st.write(transcript.text)
+        except Exception as e:
+            st.error("Something went wrong during transcription.")
+            st.exception(e)
 
-        full_text = transcript.text
-        st.subheader("📝 Transcript")
-        st.write(full_text)
-
-        # Now summarize
-        response = client.chat.completions.create(
-            model="gpt-4",
-            messages=[
-                {"role": "system", "content": "You are a helpful assistant that summarizes voice notes in 1–2 sentences."},
-                {"role": "user", "content": full_text}
-            ]
-        )
-        summary = response.choices[0].message.content
-
-        st.subheader("🧠 Summary")
-        st.write(summary)
 
