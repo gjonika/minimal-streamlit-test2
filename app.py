@@ -1,43 +1,21 @@
 import streamlit as st
-from urllib.parse import urlparse, parse_qs
+from urllib.parse import unquote
+from openai import OpenAI
+import tempfile
 
-# --- Secret Access Code ---
-ALLOWED_CODE = "letmein123"  # Change this to your real secret
+# ✅ MUST be first Streamlit command
+st.set_page_config(page_title="Voice Notetaker", layout="centered")
 
-# --- Check if user provided correct code ---
-query_params = st.experimental_get_query_params()
-provided_code = query_params.get("code", [""])[0]
+# --- Secret Access Code Logic ---
+ALLOWED_CODE = "letmein123"  # Change to your private invite code
+query_params = st.query_params
+provided_code = query_params.get("code", "")
 
 if provided_code != ALLOWED_CODE:
     st.error("🚫 Access Denied. Please use a valid invite link.")
-    st.stop()  # Halt the app here
+    st.stop()
 
-import openai
-import tempfile
-
-# Set your page config
-st.set_page_config(page_title="Voice Notetaker", layout="centered")
-
-st.title("🗣️ Voice Notetaker (Step 1)")
-st.write("Upload a WAV audio file to transcribe it.")
-
-# Upload audio
-uploaded_file = st.file_uploader("Upload a WAV file", type=["wav"])
-
-# Transcribe if file is uploaded
-if uploaded_file is not None:
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp:
-        tmp.write(uploaded_file.read())
-        tmp_path = tmp.name
-
-    st.audio(tmp_path, format='audio/wav')
-
-
-from openai import OpenAI
-import streamlit as st
-import tempfile
-
-st.set_page_config(page_title="Voice Notetaker", layout="centered")
+# --- App UI ---
 st.title("🗣️ Voice Notetaker")
 st.write("Upload a WAV file to transcribe and summarize it.")
 
@@ -61,8 +39,7 @@ if uploaded_file is not None:
                 )
                 st.subheader("📝 Transcript")
                 st.write(transcript.text)
+
         except Exception as e:
-            st.error("Something went wrong during transcription.")
+            st.error("❌ Something went wrong during transcription.")
             st.exception(e)
-
-
