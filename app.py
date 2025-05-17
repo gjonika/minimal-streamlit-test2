@@ -34,7 +34,7 @@ with st.expander("💡 Having trouble with large files?"):
 
 # --- Upload + File Size Check ---
 uploaded_file = st.file_uploader(
-    label="**🎧 Upload a WAV file**  \n_Max 25MB • WAV format only_",
+    label="**🎧 Upload a WAV file**  \n_Max 25MB_",
     type=["wav"]
 )
 
