@@ -3,11 +3,11 @@ from urllib.parse import unquote
 from openai import OpenAI
 import tempfile
 
-# ✅ MUST be first Streamlit command
+# ✅ Must be FIRST Streamlit command
 st.set_page_config(page_title="Voice Notetaker", layout="centered")
 
 # --- Secret Access Code Logic ---
-ALLOWED_CODE = "letmein123"  # Change to your private invite code
+ALLOWED_CODE = "letmein123"
 query_params = st.query_params
 provided_code = query_params.get("code", "")
 
