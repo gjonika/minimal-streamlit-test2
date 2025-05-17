@@ -19,11 +19,7 @@ if uploaded_file is not None:
 
     st.audio(tmp_path, format='audio/wav')
 
-    if st.button("🧠 Transcribe Audio"):
-        with open(tmp_path, "rb") as audio_file:
-            transcript = openai.Audio.transcribe("whisper-1", audio_file)
-            st.subheader("📝 Transcript")
-            st.write(transcript["text"])
+
 from openai import OpenAI
 
 client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])  # uses Streamlit Cloud secrets
