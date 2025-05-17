@@ -1,9 +1,26 @@
 import streamlit as st
+import openai
+import tempfile
 
-st.set_page_config(page_title="Test App", layout="centered")
+# Set your page config
+st.set_page_config(page_title="Voice Notetaker", layout="centered")
 
-st.title("🎉 Hello from Streamlit!")
-st.write("This is your first minimal Streamlit app.")
+st.title("🗣️ Voice Notetaker (Step 1)")
+st.write("Upload a WAV audio file to transcribe it.")
 
-if st.button("Click me"):
-    st.success("✅ You clicked the button!")
+# Upload audio
+uploaded_file = st.file_uploader("Upload a WAV file", type=["wav"])
+
+# Transcribe if file is uploaded
+if uploaded_file is not None:
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp:
+        tmp.write(uploaded_file.read())
+        tmp_path = tmp.name
+
+    st.audio(tmp_path, format='audio/wav')
+
+    if st.button("🧠 Transcribe Audio"):
+        with open(tmp_path, "rb") as audio_file:
+            transcript = openai.Audio.transcribe("whisper-1", audio_file)
+            st.subheader("📝 Transcript")
+            st.write(transcript["text"])
