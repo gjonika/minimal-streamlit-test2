@@ -4,7 +4,12 @@ from openai import OpenAI
 import tempfile
 
 # ✅ Must be first Streamlit command
-st.set_page_config(page_title="Voice Notetaker", layout="centered")
+st.set_page_config(
+    page_title="Voice Notetaker",
+    page_icon="🧠",  # or use your own .ico file (see below)
+    layout="centered"
+)
+
 
 # --- Secret Access Code Logic ---
 ALLOWED_CODE = "letmein123"
